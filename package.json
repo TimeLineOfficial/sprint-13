@@ -1,0 +1,9 @@
+{
+  "name": "apextrack-enterprise",
+  "version": "2.4.0",
+  "description": "ApexTrack Enterprise - Global Autonomous Telemetry & Fleet Mesh (Sprint 13 Capstone)",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Static assets ready for edge deployment'"
+  }
+}
