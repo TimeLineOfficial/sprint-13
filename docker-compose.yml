@@ -71,7 +71,7 @@ services:
   auth-service:
     build:
       context: ./microservices/auth-service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.service
     container_name: apextrack-auth-service
     restart: unless-stopped
     environment:
@@ -105,7 +105,7 @@ services:
   dispatch-service:
     build:
       context: ./microservices/dispatch-service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.service
     container_name: apextrack-dispatch-service
     restart: unless-stopped
     environment:
@@ -138,7 +138,7 @@ services:
   telemetry-service:
     build:
       context: ./microservices/telemetry-service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.service
     container_name: apextrack-telemetry-service
     restart: unless-stopped
     environment:
@@ -168,7 +168,7 @@ services:
   analytics-worker:
     build:
       context: ./microservices/analytics-worker
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.service
     container_name: apextrack-analytics-worker
     restart: unless-stopped
     environment:
