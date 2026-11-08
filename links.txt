@@ -1,0 +1,22 @@
+==============================================================================
+Sprint 13 Capstone Phase Submission Links Manifest
+Associate Software Engineer: Himesh Singh (PDIT-FTE-11462)
+Directive: Sprint 13 — Capstone Phase: Architecture & PRD
+==============================================================================
+
+GitHub Repository URL:
+https://github.com/TimeLineOfficial/Sprint-13
+
+Live Production Edge Deployment URL:
+https://timelineofficial.github.io/Sprint-13/
+
+Technical QA Walkthrough Video URL:
+https://youtu.be/vdJoz7cA2Sg
+
+==============================================================================
+Phase Deliverables Overview:
+• Phase 1 (PRD): PRD.md
+• Phase 2 (ERD & Normalization): ERD.md & database/schema.sql
+• Phase 3 (Microservices & Docker Blueprint): ARCHITECTURE.md & docker-compose.yml
+• Edge Frontend Web Portal: index.html, styles.css, app.js
+==============================================================================

@@ -1,0 +1,13 @@
+{
+  "name": "apextrack-telemetry-service",
+  "version": "2.4.0",
+  "description": "High-Throughput Telemetry Ingestion Engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  }
+}

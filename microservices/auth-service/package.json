@@ -1,0 +1,14 @@
+{
+  "name": "apextrack-auth-service",
+  "version": "2.4.0",
+  "description": "ApexTrack Enterprise Authentication & IAM Microservice",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5"
+  }
+}

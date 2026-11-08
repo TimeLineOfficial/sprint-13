@@ -1,0 +1,246 @@
+version: '3.8'
+
+# ============================================================================
+# ApexTrack Enterprise Microservices Topology
+# Production Multi-Container Orchestration Blueprint (Sprint 13 Deliverable)
+# Isolated Networks: frontend-net, backend-net, data-net
+# ============================================================================
+
+networks:
+  frontend-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.1.0/24
+  backend-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.2.0/24
+  data-net:
+    driver: bridge
+    internal: true # Strict internal network - no outbound or external traffic
+    ipam:
+      config:
+        - subnet: 172.28.3.0/24
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+services:
+  # --------------------------------------------------------------------------
+  # 1. Edge API Gateway & Reverse Proxy
+  # --------------------------------------------------------------------------
+  api-gateway:
+    image: nginx:1.25-alpine
+    container_name: apextrack-api-gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./public:/usr/share/nginx/html:ro
+    networks:
+      - frontend-net
+      - backend-net
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      dispatch-service:
+        condition: service_healthy
+      telemetry-service:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # --------------------------------------------------------------------------
+  # 2. Authentication & IAM Microservice
+  # --------------------------------------------------------------------------
+  auth-service:
+    build:
+      context: ./microservices/auth-service
+      dockerfile: Dockerfile
+    container_name: apextrack-auth-service
+    restart: unless-stopped
+    environment:
+      - PORT=4001
+      - NODE_ENV=production
+      - JWT_SECRET=apextrack_super_secure_enterprise_key_2026
+      - DATABASE_URL=postgres://apextrack_admin:SecOps_P@ssw0rd_2026@postgres-db:5432/apextrack_enterprise
+      - REDIS_URL=redis://redis-cache:6379
+    networks:
+      - backend-net
+      - data-net
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 384M
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:4001/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # --------------------------------------------------------------------------
+  # 3. Fleet & Dispatch Microservice
+  # --------------------------------------------------------------------------
+  dispatch-service:
+    build:
+      context: ./microservices/dispatch-service
+      dockerfile: Dockerfile
+    container_name: apextrack-dispatch-service
+    restart: unless-stopped
+    environment:
+      - PORT=4002
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://apextrack_admin:SecOps_P@ssw0rd_2026@postgres-db:5432/apextrack_enterprise
+      - REDIS_URL=redis://redis-cache:6379
+    networks:
+      - backend-net
+      - data-net
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:4002/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # --------------------------------------------------------------------------
+  # 4. High-Throughput Telemetry Ingestion Engine
+  # --------------------------------------------------------------------------
+  telemetry-service:
+    build:
+      context: ./microservices/telemetry-service
+      dockerfile: Dockerfile
+    container_name: apextrack-telemetry-service
+    restart: unless-stopped
+    environment:
+      - PORT=4003
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis-cache:6379
+    networks:
+      - backend-net
+      - data-net
+    depends_on:
+      redis-cache:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:4003/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # --------------------------------------------------------------------------
+  # 5. Analytics & Geofencing Background Worker
+  # --------------------------------------------------------------------------
+  analytics-worker:
+    build:
+      context: ./microservices/analytics-worker
+      dockerfile: Dockerfile
+    container_name: apextrack-analytics-worker
+    restart: unless-stopped
+    environment:
+      - PORT=4004
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://apextrack_admin:SecOps_P@ssw0rd_2026@postgres-db:5432/apextrack_enterprise
+      - REDIS_URL=redis://redis-cache:6379
+    networks:
+      - backend-net
+      - data-net
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:4004/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # --------------------------------------------------------------------------
+  # 6. In-Memory Cache & Stream Ingestion Buffer (Redis 7)
+  # --------------------------------------------------------------------------
+  redis-cache:
+    image: redis:7.2-alpine
+    container_name: apextrack-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "384mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - data-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # --------------------------------------------------------------------------
+  # 7. Relational 3NF Persistent Data Layer (PostgreSQL 16 + PostGIS)
+  # --------------------------------------------------------------------------
+  postgres-db:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: apextrack-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=apextrack_admin
+      - POSTGRES_PASSWORD=SecOps_P@ssw0rd_2026
+      - POSTGRES_DB=apextrack_enterprise
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    networks:
+      - data-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 1024M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apextrack_admin -d apextrack_enterprise"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

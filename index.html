@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ApexTrack Enterprise - Global Autonomous Logistics & Telemetry Orchestration Platform. Commercial-grade microservices capstone application.">
+  <title>ApexTrack Enterprise | Global Telemetry & Fleet Orchestration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚛</text></svg>">
+</head>
+<body class="enterprise-theme">
+  <!-- Top Global Header -->
+  <header class="app-header" role="banner">
+    <div class="header-container">
+      <div class="brand-group">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            <span class="brand-highlight">ApexTrack</span> Enterprise
+            <span class="badge badge-prod">v2.4 Production</span>
+          </div>
+          <div class="brand-subtitle">Autonomous Telemetry & High-Throughput Fleet Mesh</div>
+        </div>
+      </div>
+
+      <div class="header-stats" aria-label="System status indicators">
+        <div class="stat-pill">
+          <span class="status-dot live-pulse" aria-hidden="true"></span>
+          <span class="stat-label">Telemetry Ingestion:</span>
+          <span class="stat-val font-mono" id="stat-ingestion-rate">48,250 pings/s</span>
+        </div>
+        <div class="stat-pill mobile-hide">
+          <span class="stat-label">Latency (p99):</span>
+          <span class="stat-val font-mono text-cyan">138 ms</span>
+        </div>
+        <div class="stat-pill mobile-hide">
+          <span class="stat-label">Cluster SLA:</span>
+          <span class="stat-val text-emerald">99.99% HA</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-open-dispatch" class="btn btn-primary" aria-haspopup="dialog">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Dispatch Cargo
+        </button>
+        <button id="btn-toggle-docs" class="btn btn-secondary" aria-haspopup="dialog" title="View Capstone Architecture, PRD, and ERD">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Architecture & PRD
+        </button>
+      </div>
+    </div>
+
+    <!-- Sub-Nav Tab Bar -->
+    <nav class="sub-nav" role="navigation" aria-label="Application sections">
+      <button class="nav-tab active" data-tab="live-radar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="2" x2="12" y2="12"></line><line x1="12" y1="12" x2="19.07" y2="4.93"></line></svg>
+        Live Telemetry Radar
+      </button>
+      <button class="nav-tab" data-tab="shipment-manifests">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+        Shipment Manifests (<span id="manifest-count-tab">3</span>)
+      </button>
+      <button class="nav-tab" data-tab="incident-alerts">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        Incident Alerts (<span id="alert-count-tab" class="text-rose">2</span>)
+      </button>
+      <button class="nav-tab" data-tab="capstone-specs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+        Microservices Blueprint & ERD
+      </button>
+    </nav>
+  </header>
+
+  <!-- Incident Critical Alert Ribbon -->
+  <div id="critical-alert-banner" class="alert-banner alert-p0" role="region" aria-label="Critical alert banner">
+    <div class="alert-content">
+      <div class="alert-icon-pulse" aria-hidden="true">⚠️</div>
+      <div class="alert-text">
+        <strong>CRITICAL P0 EXCURSION:</strong> Vehicle <code class="font-mono">VEH-8805</code> (Shipment <code class="font-mono">ATX-2026-9025</code>) Cold-Chain sensor breached threshold (-12.4°C vs -18.0°C). Automated chiller override dispatched.
+      </div>
+    </div>
+    <button id="btn-ack-banner" class="btn btn-sm btn-outline-white">Acknowledge</button>
+  </div>
+
+  <!-- Main Application Body -->
+  <main class="app-main" id="main-content">
+    
+    <!-- KPI Ribbon Overview -->
+    <section class="kpi-grid" aria-label="Enterprise key performance indicators">
+      <div class="kpi-card">
+        <div class="kpi-meta">Active Autonomous Fleet</div>
+        <div class="kpi-value font-mono">1,420 <span class="kpi-delta text-emerald">+4.2%</span></div>
+        <div class="kpi-sub">Across 8 Regional Hubs</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-meta">In-Transit Freight Orders</div>
+        <div class="kpi-value font-mono" id="kpi-in-transit-count">842 <span class="kpi-delta text-cyan">Live</span></div>
+        <div class="kpi-sub">98.4% On-Schedule</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-meta">Cold-Chain Compliance</div>
+        <div class="kpi-value font-mono text-amber">99.85% <span class="kpi-delta text-amber">1 Alert</span></div>
+        <div class="kpi-sub">Target SLA >= 99.80%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-meta">Docker Microservice Health</div>
+        <div class="kpi-value font-mono text-emerald">7 / 7 UP</div>
+        <div class="kpi-sub">Gateway, Auth, Telemetry, Redis, DB</div>
+      </div>
+    </section>
+
+    <!-- TAB 1: Live Radar & Telemetry Stream -->
+    <section id="tab-live-radar" class="tab-pane active" aria-labelledby="tab-radar-heading">
+      <h2 id="tab-radar-heading" class="sr-only">Live Telemetry Radar View</h2>
+      <div class="dashboard-split">
+        
+        <!-- Interactive Telemetry Radar Grid -->
+        <div class="radar-panel card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Geographical Transit Mesh & Live Radar</h3>
+              <p class="card-subtitle">Real-time vector position simulation with sub-second dead reckoning</p>
+            </div>
+            <div class="radar-controls">
+              <span class="live-tag"><span class="pulse-dot"></span> LIVE GPS STREAM</span>
+              <button id="btn-recenter-radar" class="btn btn-xs btn-outline">Recenter View</button>
+            </div>
+          </div>
+          <div class="radar-viewport-container">
+            <svg id="radar-canvas" viewBox="0 0 800 460" preserveAspectRatio="xMidYMid meet" aria-label="Interactive Fleet Radar Grid">
+              <!-- Coordinate Grid Lines -->
+              <defs>
+                <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                </pattern>
+                <radialGradient id="radar-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(6,182,212,0.12)"/>
+                  <stop offset="100%" stop-color="transparent"/>
+                </radialGradient>
+              </defs>
+              <rect width="800" height="460" fill="#0c1220"/>
+              <rect width="800" height="460" fill="url(#grid-pattern)"/>
+              <circle cx="400" cy="230" r="180" fill="url(#radar-glow)" stroke="rgba(6,182,212,0.15)" stroke-dasharray="4 4"/>
+              <circle cx="400" cy="230" r="100" fill="none" stroke="rgba(6,182,212,0.2)"/>
+              <circle cx="400" cy="230" r="40" fill="none" stroke="rgba(6,182,212,0.3)"/>
+              
+              <!-- Corridor Paths -->
+              <path d="M 120 340 Q 280 260 400 230 T 680 120" fill="none" stroke="rgba(6,182,212,0.35)" stroke-width="2" stroke-dasharray="6 4"/>
+              <path d="M 160 110 Q 320 180 400 230 T 640 370" fill="none" stroke="rgba(16,185,129,0.35)" stroke-width="2" stroke-dasharray="6 4"/>
+
+              <!-- Geofence Zone Polygons -->
+              <polygon points="620,80 740,90 710,180 590,160" fill="rgba(6,182,212,0.08)" stroke="#06b6d4" stroke-width="1.5"/>
+              <text x="630" y="105" fill="#06b6d4" font-size="10" font-family="monospace">DEPOT: NYC-01</text>
+
+              <polygon points="80,280 200,290 180,390 60,370" fill="rgba(16,185,129,0.08)" stroke="#10b981" stroke-width="1.5"/>
+              <text x="90" y="305" fill="#10b981" font-size="10" font-family="monospace">HUB: BOS-NORTH</text>
+
+              <!-- Vehicle Markers -->
+              <!-- Vehicle 1: VEH-8802 (Electric Tractor) -->
+              <g id="marker-veh-8802" class="vehicle-node" transform="translate(380, 220)" tabindex="0" role="button" aria-label="Select Vehicle VEH-8802">
+                <circle r="14" fill="rgba(6,182,212,0.25)" class="pulse-ring"/>
+                <circle r="6" fill="#06b6d4"/>
+                <text x="12" y="4" fill="#e2e8f0" font-size="11" font-weight="bold" font-family="sans-serif">VEH-8802 (Pharma)</text>
+              </g>
+
+              <!-- Vehicle 2: VEH-8805 (Hybrid) - Alert State -->
+              <g id="marker-veh-8805" class="vehicle-node" transform="translate(540, 160)" tabindex="0" role="button" aria-label="Select Vehicle VEH-8805 (Warning State)">
+                <circle r="16" fill="rgba(239,68,68,0.3)" class="pulse-ring-alert"/>
+                <circle r="7" fill="#ef4444"/>
+                <text x="14" y="4" fill="#fca5a5" font-size="11" font-weight="bold" font-family="sans-serif">VEH-8805 [TEMP!]</text>
+              </g>
+
+              <!-- Vehicle 3: VEH-8812 (Diesel Heavy) -->
+              <g id="marker-veh-8812" class="vehicle-node" transform="translate(240, 170)" tabindex="0" role="button" aria-label="Select Vehicle VEH-8812">
+                <circle r="12" fill="rgba(16,185,129,0.25)" class="pulse-ring"/>
+                <circle r="6" fill="#10b981"/>
+                <text x="12" y="4" fill="#cbd5e1" font-size="11" font-family="sans-serif">VEH-8812 (Biotech)</text>
+              </g>
+            </svg>
+          </div>
+          <div class="radar-footer">
+            <span class="legend-item"><span class="legend-color" style="background:#06b6d4"></span> Normal In-Transit</span>
+            <span class="legend-item"><span class="legend-color" style="background:#ef4444"></span> Cold-Chain Excursion</span>
+            <span class="legend-item"><span class="legend-color" style="background:#10b981"></span> Dispatched / Depot</span>
+            <span class="text-muted ml-auto font-mono text-xs">Projection: WGS-84 / PostGIS 3.4</span>
+          </div>
+        </div>
+
+        <!-- Telemetry Inspector Panel (Right Column) -->
+        <div class="telemetry-panel card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title" id="inspector-vehicle-id">VEH-8802 (Electric BEV)</h3>
+              <p class="card-subtitle" id="inspector-manifest-id">Hauling: ATX-2026-9024 (Cold-Chain Pharma)</p>
+            </div>
+            <span class="badge badge-cyan" id="inspector-status-badge">IN TRANSIT</span>
+          </div>
+
+          <div class="telemetry-gauges">
+            <!-- Gauge 1: Speed -->
+            <div class="gauge-box">
+              <div class="gauge-label">Ground Velocity</div>
+              <div class="gauge-value font-mono" id="tel-speed">88 <span class="gauge-unit">km/h</span></div>
+              <div class="progress-bar-bg">
+                <div class="progress-fill fill-cyan" id="progress-speed" style="width: 73%;"></div>
+              </div>
+              <div class="gauge-sub">Speed Limit: 110 km/h</div>
+            </div>
+
+            <!-- Gauge 2: Cold-Chain Cargo Temp -->
+            <div class="gauge-box">
+              <div class="gauge-label">Cargo Compartment Temp</div>
+              <div class="gauge-value font-mono text-cyan" id="tel-temp">-18.4 <span class="gauge-unit">°C</span></div>
+              <div class="progress-bar-bg">
+                <div class="progress-fill fill-emerald" id="progress-temp" style="width: 82%;"></div>
+              </div>
+              <div class="gauge-sub">Safe Zone: -22.0°C to -16.0°C</div>
+            </div>
+
+            <!-- Gauge 3: Battery / Fuel -->
+            <div class="gauge-box">
+              <div class="gauge-label">Battery State of Charge (SOC)</div>
+              <div class="gauge-value font-mono text-emerald" id="tel-battery">82 <span class="gauge-unit">%</span></div>
+              <div class="progress-bar-bg">
+                <div class="progress-fill fill-emerald" id="progress-battery" style="width: 82%;"></div>
+              </div>
+              <div class="gauge-sub">Est. Range: 342 km</div>
+            </div>
+
+            <!-- Gauge 4: Geofence Containment -->
+            <div class="gauge-box">
+              <div class="gauge-label">Geofence Containment</div>
+              <div class="gauge-value font-mono text-emerald" id="tel-geofence">CORRIDOR A-9</div>
+              <div class="gauge-sub">Hysteresis Buffer: Normal (0m drift)</div>
+            </div>
+          </div>
+
+          <!-- Waypoint Timeline -->
+          <div class="waypoint-section">
+            <h4 class="section-heading">Active Route Milestones</h4>
+            <ul class="timeline" id="waypoint-timeline">
+              <li class="timeline-item completed">
+                <div class="timeline-dot">✓</div>
+                <div class="timeline-body">
+                  <div class="timeline-title">Boston Life Sciences Hub (Origin)</div>
+                  <div class="timeline-time font-mono">Departed: 12:05 PM EST</div>
+                </div>
+              </li>
+              <li class="timeline-item active">
+                <div class="timeline-dot pulse-emerald">●</div>
+                <div class="timeline-body">
+                  <div class="timeline-title">Interstate 95 Corridor Point 42</div>
+                  <div class="timeline-time font-mono">In Transit - Next waypoint in 45m</div>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <div class="timeline-dot">○</div>
+                <div class="timeline-body">
+                  <div class="timeline-title">Manhattan Medical Depot (Destination)</div>
+                  <div class="timeline-time font-mono">ETA: 02:45 PM EST (On-Time)</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: Shipment Manifests Table -->
+    <section id="tab-shipment-manifests" class="tab-pane" aria-labelledby="tab-manifests-heading">
+      <div class="card">
+        <div class="card-header flex-wrap">
+          <div>
+            <h2 id="tab-manifests-heading" class="card-title">Commercial Shipment Manifests</h2>
+            <p class="card-subtitle">Active freight orders, cargo classification, and telemetry pairing</p>
+          </div>
+          <div class="table-filters">
+            <input type="text" id="manifest-search-input" class="form-control" placeholder="Search by Tracking #, City, or Vehicle..." aria-label="Search shipment manifests">
+            <select id="manifest-status-filter" class="form-control" aria-label="Filter shipments by status">
+              <option value="ALL">All Statuses</option>
+              <option value="IN_TRANSIT">In Transit</option>
+              <option value="DISPATCHED">Dispatched</option>
+              <option value="DELIVERED">Delivered</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="shipments-table">
+            <thead>
+              <tr>
+                <th scope="col">Tracking Number</th>
+                <th scope="col">Origin & Destination</th>
+                <th scope="col">Cargo Classification</th>
+                <th scope="col">Assigned Vehicle</th>
+                <th scope="col">Status</th>
+                <th scope="col">Est. Delivery</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="shipments-tbody">
+              <!-- Dynamically populated via app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State Container -->
+        <div id="manifest-empty-state" class="empty-state" style="display: none;">
+          <div class="empty-icon" aria-hidden="true">📦</div>
+          <h3>No matching shipments found</h3>
+          <p>No freight orders match the current filter or search criteria.</p>
+          <button id="btn-reset-filters" class="btn btn-secondary mt-2">Reset Filters</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Incident Alerts Feed -->
+    <section id="tab-incident-alerts" class="tab-pane" aria-labelledby="tab-alerts-heading">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="tab-alerts-heading" class="card-title">Active Security & Safety Incident Stream</h2>
+            <p class="card-subtitle">Geofence breaches, cold-chain temperature excursions, and IoT sensor drops</p>
+          </div>
+          <button id="btn-ack-all" class="btn btn-sm btn-outline">Acknowledge All Clear</button>
+        </div>
+
+        <div class="incident-list" id="incident-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: Capstone Specifications & Microservices Blueprint -->
+    <section id="tab-capstone-specs" class="tab-pane" aria-labelledby="tab-specs-heading">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="tab-specs-heading" class="card-title">Capstone Deliverables: Architecture, PRD & ERD Inspector</h2>
+            <p class="card-subtitle">Prodesk IT Sprint 13 — Enterprise Tier Microservice Decomposition</p>
+          </div>
+          <div class="pill-group">
+            <button class="pill-btn active" data-spec-tab="spec-phase1">Phase 1: PRD</button>
+            <button class="pill-btn" data-spec-tab="spec-phase2">Phase 2: ERD & 3NF</button>
+            <button class="pill-btn" data-spec-tab="spec-phase3">Phase 3: Docker Microservices</button>
+          </div>
+        </div>
+
+        <!-- Phase 1 Content -->
+        <div id="spec-phase1" class="spec-tab-content active">
+          <div class="spec-box">
+            <h3>Phase 1: Product Requirements Document (PRD) Summary</h3>
+            <p><strong>System Purpose:</strong> High-throughput, microservice-driven telemetry orchestration platform for enterprise logistics and cold-chain asset integrity.</p>
+            
+            <h4>User Personas</h4>
+            <ul>
+              <li><strong>Elena Rostova (Master Dispatcher):</strong> Coordinates active fleets, handles route detours, monitors live radar telemetry.</li>
+              <li><strong>Marcus Vance (Cold-Chain Auditor):</strong> Validates pharmaceutical temperature compliance and generates cryptographic reports.</li>
+              <li><strong>Sarah Chen (SecOps Lead):</strong> Oversees zero-trust token auth, rate-limiting, and network isolation between containers.</li>
+            </ul>
+
+            <h4>Key Edge Cases Handled</h4>
+            <div class="edge-grid">
+              <div class="edge-card">
+                <strong>Terrestrial Cellular Dropouts:</strong> Local sensor NVRAM store-and-forward queue up to 72 hours with sliding-window deduplication upon reconnection.
+              </div>
+              <div class="edge-card">
+                <strong>Cold-Chain Temperature Excursions:</strong> Sub-second P0 critical alert trigger, automated cab buzzer activation, and nearest cross-dock reroute.
+              </div>
+              <div class="edge-card">
+                <strong>Geofence Flapping:</strong> Hysteresis algorithm requiring 3 consecutive out-of-boundary pings with vector speed > 5 km/h.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 2 Content -->
+        <div id="spec-phase2" class="spec-tab-content">
+          <div class="spec-box">
+            <h3>Phase 2: 3NF Relational Database Schema & Proofs</h3>
+            <p>Complete normalization guarantees zero storage anomalies and concurrency safety.</p>
+
+            <div class="normalization-proofs">
+              <div class="norm-card">
+                <h4>1NF (First Normal Form)</h4>
+                <p>Every attribute contains strictly atomic, scalar values. Repeating groups (e.g., intermediate stops) are decomposed into the dedicated <code>WAYPOINTS</code> table.</p>
+              </div>
+              <div class="norm-card">
+                <h4>2NF (Second Normal Form)</h4>
+                <p>All non-key attributes depend on the entire primary key. Composite key partial dependencies eliminated via surrogate UUIDs in <code>VEHICLES</code> and <code>DRIVERS</code>.</p>
+              </div>
+              <div class="norm-card">
+                <h4>3NF (Third Normal Form)</h4>
+                <p>Transitive functional dependencies ($X \to Y \to Z$) strictly removed. Driver phone numbers and organization tiers isolated to their respective entities.</p>
+              </div>
+            </div>
+
+            <h4 class="mt-4">Relational Entity Map</h4>
+            <div class="code-block font-mono">
+ORGANIZATIONS (1) ───< (N) USERS
+ORGANIZATIONS (1) ───< (N) VEHICLES (1) ───< (N) TELEMETRY_LOGS [Partitioned BRIN]
+ORGANIZATIONS (1) ───< (N) SHIPMENTS (1) ───< (N) WAYPOINTS
+SHIPMENTS (1) ───────< (N) INCIDENT_ALERTS
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 3 Content -->
+        <div id="spec-phase3" class="spec-tab-content">
+          <div class="spec-box">
+            <h3>Phase 3: Docker Microservices & Isolated Software-Defined Networks</h3>
+            <p>Monolithic architecture eliminated. 7 isolated Docker containers communicating across 3 isolated bridge networks.</p>
+
+            <div class="network-diagram-box">
+              <div class="network-badge net-frontend">frontend-net (172.28.1.0/24): Ingress Gateway & Client HTTPS</div>
+              <div class="network-badge net-backend">backend-net (172.28.2.0/24): Gateway, Auth, Dispatch, Telemetry, Worker</div>
+              <div class="network-badge net-data">data-net (172.28.3.0/24) [INTERNAL ONLY]: PostgreSQL 16 + Redis 7</div>
+            </div>
+
+            <h4 class="mt-4">Deployed Containers & Performance Quotas</h4>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Service Name</th>
+                    <th>Container Image</th>
+                    <th>CPU Limit</th>
+                    <th>Memory Cap</th>
+                    <th>Network Scope</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>api-gateway</code></td>
+                    <td><code>nginx:1.25-alpine</code></td>
+                    <td>0.50 CPU</td>
+                    <td>256 MB</td>
+                    <td>frontend-net, backend-net</td>
+                  </tr>
+                  <tr>
+                    <td><code>auth-service</code></td>
+                    <td><code>apextrack/auth-service</code></td>
+                    <td>0.50 CPU</td>
+                    <td>384 MB</td>
+                    <td>backend-net, data-net</td>
+                  </tr>
+                  <tr>
+                    <td><code>dispatch-service</code></td>
+                    <td><code>apextrack/dispatch-service</code></td>
+                    <td>0.75 CPU</td>
+                    <td>512 MB</td>
+                    <td>backend-net, data-net</td>
+                  </tr>
+                  <tr>
+                    <td><code>telemetry-service</code></td>
+                    <td><code>apextrack/telemetry-service</code></td>
+                    <td>1.00 CPU</td>
+                    <td>512 MB</td>
+                    <td>backend-net, data-net</td>
+                  </tr>
+                  <tr>
+                    <td><code>analytics-worker</code></td>
+                    <td><code>apextrack/analytics-worker</code></td>
+                    <td>0.75 CPU</td>
+                    <td>512 MB</td>
+                    <td>backend-net, data-net</td>
+                  </tr>
+                  <tr>
+                    <td><code>redis-cache</code></td>
+                    <td><code>redis:7.2-alpine</code></td>
+                    <td>0.50 CPU</td>
+                    <td>512 MB</td>
+                    <td>data-net (Isolated)</td>
+                  </tr>
+                  <tr>
+                    <td><code>postgres-db</code></td>
+                    <td><code>postgis/postgis:16-alpine</code></td>
+                    <td>1.00 CPU</td>
+                    <td>1024 MB</td>
+                    <td>data-net (Isolated)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal: Dispatch New Shipment -->
+  <div id="dispatch-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="dispatch-modal-title" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="dispatch-modal-title" class="modal-title">Dispatch New Cargo Shipment</h3>
+        <button id="btn-close-modal" class="modal-close" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <form id="dispatch-form" novalidate>
+        <div class="form-grid">
+          
+          <div class="form-group">
+            <label for="form-tracking">Tracking Number <span class="required">*</span></label>
+            <input type="text" id="form-tracking" class="form-control font-mono" placeholder="ATX-2026-9027" required>
+            <span class="field-error" id="error-tracking"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="form-cargo-type">Cargo Classification <span class="required">*</span></label>
+            <select id="form-cargo-type" class="form-control" required>
+              <option value="COLD_CHAIN_PHARMA">Cold-Chain Pharmaceuticals (Temp Monitored)</option>
+              <option value="HIGH_VALUE_ELECTRONICS">High-Value Electronics</option>
+              <option value="HAZARDOUS_MATERIALS">Hazardous Materials (HazMat Class 3)</option>
+              <option value="DRY_GOODS">Standard Dry Freight</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="form-origin">Origin Logistics Facility <span class="required">*</span></label>
+            <input type="text" id="form-origin" class="form-control" placeholder="Chicago O'Hare Depot, IL" required>
+            <span class="field-error" id="error-origin"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="form-destination">Destination Hub <span class="required">*</span></label>
+            <input type="text" id="form-destination" class="form-control" placeholder="Atlanta Freight Center, GA" required>
+            <span class="field-error" id="error-destination"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="form-weight">Cargo Weight (kg) <span class="required">*</span></label>
+            <input type="number" id="form-weight" class="form-control font-mono" placeholder="4500" min="50" max="45000" required>
+            <span class="field-error" id="error-weight"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="form-vehicle">Assign Fleet Vehicle <span class="required">*</span></label>
+            <select id="form-vehicle" class="form-control" required>
+              <option value="veh_8802_electric">VEH-8802 [Electric BEV - Ready]</option>
+              <option value="veh_8805_hybrid">VEH-8805 [Hybrid Tractor - In Service]</option>
+              <option value="veh_8812_diesel">VEH-8812 [Diesel Heavy - Staged]</option>
+            </select>
+          </div>
+
+          <div class="form-group full-span" id="temp-range-container">
+            <label>Cold-Chain Target Temperature Window (°C)</label>
+            <div class="range-inputs">
+              <input type="number" id="form-min-temp" class="form-control font-mono" placeholder="Min: -22.0" step="0.5">
+              <span class="range-separator">to</span>
+              <input type="number" id="form-max-temp" class="form-control font-mono" placeholder="Max: -16.0" step="0.5">
+            </div>
+            <small class="form-hint">Required for Cold-Chain Pharma. Triggers P0 automated alert on boundary breach.</small>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel-dispatch" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="btn-submit-dispatch" class="btn btn-primary">
+            <span class="btn-text">Confirm & Dispatch Route</span>
+            <span class="btn-loader" style="display: none;">Authorizing...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="toast-shelf" aria-live="polite"></div>
+
+  <!-- Accessible Footer -->
+  <footer class="app-footer" role="contentinfo">
+    <div class="footer-container">
+      <div>
+        <strong>ApexTrack Enterprise</strong> &bull; Commercial Capstone Phase &bull; Prodesk IT Assessment
+      </div>
+      <div class="footer-meta">
+        Lead Architect: <strong>Himesh Singh</strong> (PDIT-FTE-11462) &bull; Production Edge Deployment
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
